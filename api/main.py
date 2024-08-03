@@ -1,13 +1,25 @@
-from fastapi import FastAPI
-from api.models import Lesson
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
 
+from . import crud, models, schemas
+from .database import SessionLocal, engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-@app.get("/lessons")
-async def get_lessons():
-    return {"message": "GET lessons"}
+@app.get("/lessons/", response_model=list[schemas.Lesson])
+def read_lessons(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    lessons = crud.get_lessons(db, skip=skip, limit=limit)
+    return lessons
 
 @app.get("/lessons/{lesson_id}")
 async def get_lesson(lesson_id: int):

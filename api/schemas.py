@@ -1,17 +1,17 @@
 from pydantic import BaseModel
 from uuid import UUID
 
-class ItemBase(BaseModel):
+class LessonBase(BaseModel):
     title: str
     transcript: str | None = None
     feedback: str | None = None
 
 
-class ItemCreate(ItemBase):
+class LessonCreate(LessonBase):
     pass
 
 
-class Item(ItemBase):
+class Lesson(LessonBase):
     id: UUID
 
     class Config:
