@@ -25,9 +25,9 @@ def read_lessons(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
 async def get_lesson(lesson_id: int):
     return {"lesson_id": lesson_id}
 
-@app.post("/lessons")
-async def create_lesson():
-    return {"message": "create lessons"}
+@app.post("/lessons/", response_model=schemas.Lesson)
+def create_lesson(lesson: schemas.LessonCreate, db: Session = Depends(get_db)):
+    return crud.create_lesson(db=db, lesson=lesson)
 
 @app.delete("/lessons/{lesson_id}")
 async def delete_lesson(lesson_id: int):
