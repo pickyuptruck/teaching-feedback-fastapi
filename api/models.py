@@ -9,6 +9,5 @@ class Lesson(Base):
 
     id = Column(UUID, primary_key=True)
     title = Column(String, default="New lesson")
-    description = Column(String, nullable=True)
     transcript = Column(String, nullable=True)
     feedback = Column(String, nullable=True) 
