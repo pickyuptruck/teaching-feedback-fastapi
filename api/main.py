@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, Form, File, UploadFile
 from sqlalchemy.orm import Session
+from typing import Annotated
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -27,20 +28,14 @@ async def get_lesson(lesson_id: int):
 
 @app.post("/lessons/", response_model=schemas.Lesson)
 def create_lesson(
-    title: str = Form(...),
-    transcript: str = Form(None),
-    feedback: str = Form(None),
-    file: UploadFile = File(...),
+    file: UploadFile,
     db: Session = Depends(get_db)
 ):
     
     # Create the lesson in the database
-    lesson_create = schemas.LessonCreate(
-        title=title,
-        transcript=transcript,
-        feedback=feedback
-    )
+    lesson_create = schemas.LessonCreate()
     lesson = crud.create_lesson(db=db, lesson=lesson_create)
+    print(file.filename)
     return lesson
 
 @app.delete("/lessons/{lesson_id}")
