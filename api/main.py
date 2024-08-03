@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Form, File, UploadFile
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
@@ -17,7 +17,7 @@ def get_db():
         db.close()
 
 @app.get("/lessons/", response_model=list[schemas.Lesson])
-def read_lessons(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_lessons(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     lessons = crud.get_lessons(db, skip=skip, limit=limit)
     return lessons
 
@@ -26,8 +26,22 @@ async def get_lesson(lesson_id: int):
     return {"lesson_id": lesson_id}
 
 @app.post("/lessons/", response_model=schemas.Lesson)
-def create_lesson(lesson: schemas.LessonCreate, db: Session = Depends(get_db)):
-    return crud.create_lesson(db=db, lesson=lesson)
+def create_lesson(
+    title: str = Form(...),
+    transcript: str = Form(None),
+    feedback: str = Form(None),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    
+    # Create the lesson in the database
+    lesson_create = schemas.LessonCreate(
+        title=title,
+        transcript=transcript,
+        feedback=feedback
+    )
+    lesson = crud.create_lesson(db=db, lesson=lesson_create)
+    return lesson
 
 @app.delete("/lessons/{lesson_id}")
 async def delete_lesson(lesson_id: int):
