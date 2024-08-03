@@ -1,10 +1,14 @@
-from uuid import UUID
-from pydantic import BaseModel
+from sqlalchemy import Column, String
+from sqlalchemy.dialects.postgresql import UUID
 
-class Lesson(BaseModel):
-    id: UUID
-    name: str
-    description: str
-    transcript: str
-    feedback: str
-    
+from .database import Base
+
+
+class Lesson(Base):
+    __tablename__ = "lessons"
+
+    id = Column(UUID, primary_key=True)
+    title = Column(String, default="New lesson")
+    description = Column(String, nullable=True)
+    transcript = Column(String, nullable=True)
+    feedback = Column(String, nullable=True) 
